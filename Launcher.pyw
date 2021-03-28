@@ -7,7 +7,7 @@ from UI_API.Search_box import Search_box
 from UI_API.Side_label import Side_label
 from UI_API.Text_view import Text_view
 from Mediator import Search_Mediator
-from Control import Control
+from Control import MyKeyboard
 
 
 class Launcher():
@@ -21,8 +21,8 @@ class Launcher():
         self.text_view = Text_view(self.ui.text_view)
         Search_Mediator(self.search_box, self.list_box, self.text_view)
 
-        self.state = State_show(self)  # UI组件中可以访问state了
-        self.control = Control(self)
+        self.state = State_show(self)
+        self.control = MyKeyboard(self)
         self.main_window.mainloop()
 
 

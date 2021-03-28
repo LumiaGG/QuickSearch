@@ -46,7 +46,7 @@ class State_show(State):
 
     def win_q(self,):
         print("关")
-        self.context.control.unhook_tab()
+        self.context.control.unhook_suppress()
         self.context.state = State_hide(self.context)
         self.update_UI_state()
         self.context.base_window.hide_window()
@@ -86,7 +86,7 @@ class State_hide(State):
 
     def win_q(self,):
         print("开")
-        self.context.control.hook_tab()
+        self.context.control.hook_suppress()
         self.context.state = State_show(self.context)
         self.update_UI_state()
         self.context.base_window.show_window()
