@@ -52,7 +52,7 @@ class State_show(State):
         self.context.base_window.hide_window()
 
     def win_w(self,):
-        print("现在是show状态,执行了win_w")
+        print("win_w")
         from WebClipboard import read_local_clip
         self.context.text_view.show_view()
         self.context.text_view.write_view(read_local_clip())
