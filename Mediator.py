@@ -27,6 +27,10 @@ class Search_Mediator(Mediator):
         elif event.get("translation_query", None):
             self.text_view.show_view()
             self.text_view.write_view(event.get("translation_query"))
+        elif event.get("type_sug", None):
+            self.search_box.entry.delete(0, 'end')
+            self.search_box.entry.insert(0, event.get("type_sug"))
+            self.search_box.get_focues()
         else:
             pass
 

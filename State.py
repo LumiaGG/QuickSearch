@@ -64,9 +64,14 @@ class State_show(State):
 
     def enter(self):
         print('enter')
-        self.context.search_box.search_web()
-        if search_engine.search_engines[0].get("name") != "google翻译":
-            self.win_q()
+        if self.context.list_box.focues():
+            print("list_box")
+            self.context.list_box.enter()
+        elif self.context.search_box.focues():
+            print("search_box")
+            self.context.search_box.enter()
+            if search_engine.search_engines[0].get("name") != "google翻译":
+                self.win_q()
 
     def up(self):
         print("up")

@@ -19,7 +19,7 @@ class Search_box():
         if str(self.entry.focus_get()) != ".!entry":
             self.entry.focus_set()
 
-    def search_web(self):
+    def enter(self):
         if search_engine.search_engines[0].get("name") == "google翻译":
             self.mediator.notify(self, {"translation_query": self.entry.get()})
         else:
@@ -29,3 +29,9 @@ class Search_box():
 
     def get_content(self):
         return self.entry.get()
+
+    def focues(self):
+        if str(self.entry.focus_get()) == ".!entry":
+            return True
+        else:
+            return False
