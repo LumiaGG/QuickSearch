@@ -47,8 +47,9 @@ class List_box():
         '''
         请求webclip后的回调
         '''
+        print(json_all)
         if json_all.get("sucess", False):
-            if json_all.get("contents", None) and not self.th_lock and self.state == "show":
+            if json_all.get("contents", None) != None and not self.th_lock and self.state == "show":
                 # 下载web的内容
                 self.clip_contents = json_all.get("contents", None)
                 self.clip_contents.insert(0, read_local_clip())
@@ -56,6 +57,13 @@ class List_box():
             elif not self.th_lock and self.state == "show":
                 # 上传
                 self.clip_contents.insert(0, self.clip_contents[0])
+                self.update_list_box(self.clip_contents)
+
+    def wenclip_call_delete(self, json_all):
+        print(json_all)
+        if json_all.get("sucess", False) and not self.th_lock and self.state == "show":
+            if len(self.clip_contents) > json_all.get("index")+1:
+                self.clip_contents.pop(json_all.get("index")+1)
                 self.update_list_box(self.clip_contents)
 
     def get_focues(self):
@@ -98,3 +106,11 @@ class List_box():
             sug = self.list_box.get(self.get_curselection()[0])
             print(sug)
             self.mediator.notify(self, {"type_sug": sug})
+
+    def left(self):
+        '''
+        注意self.clip_contents中第一个是本地内容
+        '''
+        if self.get_curselection()[0] > 0:
+            self.webClipboard.delete_web_clip(
+                self.get_curselection()[0]-1, self.wenclip_call_delete)

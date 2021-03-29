@@ -30,6 +30,9 @@ class State():
     def up(self):
         pass
 
+    def left(self):
+        pass
+
     def update_UI_state(self):
         print("update_UI_state")
         self.context.list_box.state = self.context.state.statement()
@@ -82,6 +85,10 @@ class State_show(State):
         print("down")
         print(self.context.list_box.get_size())
         self.context.list_box.get_focues()
+
+    def left(self):
+        print("left")
+        self.context.list_box.left()
 
 
 class State_hide(State):

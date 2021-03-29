@@ -4,12 +4,22 @@ import win32clipboard
 import threading
 
 
+def new_thread(func):
+    def wrapper(*args, **kwargs):
+        th = threading.Thread(
+            target=func, args=args)
+        th.setDaemon(True)
+        th.start()
+    return wrapper
+
+
 class WebClipboard():
     def __init__(self):
         self.server_url = "http://119.29.130.26:7000/webclipboard/"
         self.auth_admin = "iiioooppp"
 
-    def read_web_clip_(self, start, end, call=None):
+    @new_thread
+    def read_web_clip(self, start, end, call=None):
         '''
         读取web的内容
         将返回内容传给回调函数
@@ -24,23 +34,19 @@ class WebClipboard():
         else:
             call(json_all)
 
-    def read_web_clip(self, start, end, call=None):
-        th_read = threading.Thread(
-            target=self.read_web_clip_, args=(start, end, call))
-        th_read.setDaemon(True)
-        th_read.start()
-
-    def write_web_clip_(self, content: str, call=None):
+    @new_thread
+    def write_web_clip(self, content: str, call=None):
         data = {"auth": self.auth_admin, "content": content}
         r = requests.post(self.server_url+"write", json=data)
         json_all = json.loads(r.text)
         call(json_all)
 
-    def write_web_clip(self, content: str, call=None):
-        th_write = threading.Thread(
-            target=self.write_web_clip_, args=(content, call))
-        th_write.setDaemon(True)
-        th_write.start()
+    @new_thread
+    def delete_web_clip(self, index: int, call=None):
+        data = {"auth": self.auth_admin, "index": index}
+        r = requests.post(self.server_url+"delete", json=data)
+        json_all = json.loads(r.text)
+        call(json_all)
 
 
 def read_local_clip():

@@ -10,7 +10,7 @@ import Clipboard
 class MyKeyboard():
     def __init__(self, context):
         self.keys = [["left windows", False], ['q', False], [
-            'w', False], ['tab', True], ['down', False], ['up', False], ['enter', False]]
+            'w', False], ['tab', True], ['down', False], ['up', False], ['left', False], ['enter', False]]
         self.key_map = {}
         self.context = context
         self.keyboard = keyboard
@@ -51,6 +51,7 @@ class MyKeyboard():
                    ("left windows", "w", self.context.state.win_w),
                    ("down", self.context.state.down),
                    ("up", self.context.state.up),
+                   ("left", self.context.state.left),
                    ("tab", self.context.state.tab),
                    ("enter", self.context.state.enter),
                    ]
