@@ -1,12 +1,12 @@
 from tkinter import Label
 from Search_engine import search_engine
-
+from MyEnum import WindowsShowMode
 
 class Side_label():
     def __init__(self, label_logos: list):
         self.label_logos = label_logos
         self.mediator = object
-        self.state = object
+        self.state = WindowsShowMode.show
         search_engine.load_img()
         self.update_logo()
         self.bind_click()

@@ -1,14 +1,16 @@
 from tkinter import Text
+from tkinter.constants import W
 import tkinter.font as tkFont
 from threading import Thread
 from Translation import Translation
+from MyEnum import WindowsShowMode
 
 
 class Text_view():
     def __init__(self, Text_view: Text):
         self.text_view = Text_view
         self.mediator = object
-        self.state = object
+        self.state = WindowsShowMode.hide
         self.isShow = False
         self.translation = Translation()
         self.ft = tkFont.Font(family='微软雅黑', size=11,)

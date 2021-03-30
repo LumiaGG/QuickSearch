@@ -2,6 +2,7 @@ import webbrowser
 from Search_engine import search_engine
 from tkinter import Entry
 from time import sleep
+from MyEnum import NotifyEvent, WindowsShowMode
 
 
 class Search_box():
@@ -9,10 +10,10 @@ class Search_box():
         self.entry = entry
         self.entry.configure(validatecommand=self.validatecommand)
         self.mediator = object
-        self.state = object
+        self.state = WindowsShowMode.show
 
     def validatecommand(self):
-        self.mediator.notify(self, {"suggestions": True})
+        self.mediator.notify(self, {NotifyEvent.validatecommand: True})
         return True
 
     def get_focues(self):
@@ -20,8 +21,11 @@ class Search_box():
             self.entry.focus_set()
 
     def enter(self):
+        self.mediator.notify(
+            self, {NotifyEvent.insert_history: self.entry.get()})
         if search_engine.search_engines[0].get("name") == "google翻译":
-            self.mediator.notify(self, {"translation_query": self.entry.get()})
+            self.mediator.notify(
+                self, {NotifyEvent.translation: self.entry.get()})
         else:
             webbrowser.open(search_engine.search_engines[0].get("url").format(
                 self.entry.get()))

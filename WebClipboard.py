@@ -17,6 +17,8 @@ class WebClipboard():
     def __init__(self):
         self.server_url = "http://119.29.130.26:7000/webclipboard/"
         self.auth_admin = "iiioooppp"
+        self.webClip_contents = []
+        self.locClip_content = ""
 
     @new_thread
     def read_web_clip(self, start, end, call=None):
@@ -29,7 +31,8 @@ class WebClipboard():
         data = {"auth": self.auth_admin, "start": start, "end": end}
         r = requests.post(self.server_url+"read", json=data)
         json_all = json.loads(r.text)
-        if json_all.get("sucess"):
+        if json_all.get("sucess") and json_all.get("contents", None) != None:
+            self.webClip_contents = json_all.get("contents")
             call(json_all)
         else:
             call(json_all)
@@ -39,6 +42,8 @@ class WebClipboard():
         data = {"auth": self.auth_admin, "content": content}
         r = requests.post(self.server_url+"write", json=data)
         json_all = json.loads(r.text)
+        if json_all.get("sucess"):
+            self.webClip_contents.insert(0, content)
         call(json_all)
 
     @new_thread
@@ -46,7 +51,9 @@ class WebClipboard():
         data = {"auth": self.auth_admin, "index": index}
         r = requests.post(self.server_url+"delete", json=data)
         json_all = json.loads(r.text)
-        call(json_all)
+        if json_all.get("sucess") and json_all.get("index") == index:
+            self.webClip_contents.pop(index)
+            call(json_all)
 
 
 def read_local_clip():

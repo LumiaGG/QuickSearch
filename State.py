@@ -1,4 +1,5 @@
 from Search_engine import search_engine
+from MyEnum import WindowsShowMode
 
 
 class State():
@@ -45,7 +46,7 @@ class State():
 class State_show(State):
 
     def statement(self):
-        return "show"
+        return WindowsShowMode.show
 
     def win_q(self,):
         print("关")
@@ -94,7 +95,7 @@ class State_show(State):
 class State_hide(State):
 
     def statement(self):
-        return "hide"
+        return WindowsShowMode.hide
 
     def win_q(self,):
         print("开")
@@ -108,7 +109,7 @@ class State_hide(State):
 
     def win_w(self,):
         print("现在是hide状态,执行了win_w")
-        self.context.control.hook_tab()
+        self.context.control.hook_suppress()
         self.context.state = State_show(self.context)
         self.update_UI_state()
         self.context.base_window.show_window()

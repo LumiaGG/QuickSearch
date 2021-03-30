@@ -1,21 +1,22 @@
-from threading import Lock, Thread
-from tkinter import Listbox
+from ctypes import wintypes
+from History import History
+from tkinter import Listbox, constants
 from Search_for_suggestions import Search_for_suggestions
 from WebClipboard import WebClipboard, read_local_clip, write_local_clip
-from State import State_show
+from History import History
+from MyEnum import ContentShowMode, WindowsShowMode
 
 
 class List_box():
     def __init__(self, list_box: Listbox):
         self.list_box = list_box
         self.mediator = object
-        self.state = object
-        self.th_lock = False
+        self.state = WindowsShowMode.show
         self.pre_selection = None
-        self.clipboard_mode = False
+        self.show_mode = ContentShowMode.clip
         self.clip_contents = []
-        self.suggestion = Search_for_suggestions()
         self.webClipboard = WebClipboard()
+        self.history = History()
         self.update_webclip()
 
     def update_list_box(self, content: list):
@@ -23,24 +24,11 @@ class List_box():
         for i in content:
             self.list_box.insert('end', i)
 
-    def update_suggestions_(self, query: str):
-        # self.th_lock.acquire()
-        self.th_lock = True
-        self.clipboard_mode = False
-        self.update_list_box(self.suggestion.get_suggestions(query))
-        # self.th_lock.release()
-        self.th_lock = False
-
-    def update_suggestions(self, query: str):
-        if not self.th_lock:
-            th = Thread(target=self.update_suggestions_, args=(query,))
-            th.start()
-        return True
-
     def update_webclip(self):
-        if not self.th_lock and self.state == "show":
+        if self.state == WindowsShowMode.show:
             print("update_webclip")
-            self.clipboard_mode = True
+            self.show_mode = ContentShowMode.clip
+            self.webClipboard.locClip_content = read_local_clip()
             self.webClipboard.read_web_clip(0, 0, self.webclip_call)
 
     def webclip_call(self, json_all):
@@ -48,23 +36,16 @@ class List_box():
         请求webclip后的回调
         '''
         print(json_all)
-        if json_all.get("sucess", False):
-            if json_all.get("contents", None) != None and not self.th_lock and self.state == "show":
-                # 下载web的内容
-                self.clip_contents = json_all.get("contents", None)
-                self.clip_contents.insert(0, read_local_clip())
-                self.update_list_box(self.clip_contents)
-            elif not self.th_lock and self.state == "show":
-                # 上传
-                self.clip_contents.insert(0, self.clip_contents[0])
-                self.update_list_box(self.clip_contents)
+        if self.show_mode == ContentShowMode.clip:
+            contents = self.webClipboard.webClip_contents.copy()
+            contents.insert(0, self.webClipboard.locClip_content)
+            self.update_list_box(contents)
 
-    def wenclip_call_delete(self, json_all):
-        print(json_all)
-        if json_all.get("sucess", False) and not self.th_lock and self.state == "show":
-            if len(self.clip_contents) > json_all.get("index")+1:
-                self.clip_contents.pop(json_all.get("index")+1)
-                self.update_list_box(self.clip_contents)
+    def update_history(self):
+        if self.state == WindowsShowMode.show:
+            print("update_history")
+            self.show_mode = ContentShowMode.history
+            self.update_list_box(self.history.get())
 
     def get_focues(self):
         if str(self.list_box.focus_get()) != ".!listbox" and self.get_size() != 0:
@@ -89,19 +70,21 @@ class List_box():
             return False
 
     def enter(self):
-        if self.clipboard_mode:
+        if self.show_mode == ContentShowMode.clip:
             if self.get_curselection()[0] == 0:
                 # 上传
                 self.webClipboard.write_web_clip(
-                    self.clip_contents[0], self.webclip_call)
+                    self.webClipboard.locClip_content, self.webclip_call)
             else:
                 # 下载
                 write_local_clip(
-                    self.clip_contents[self.get_curselection()[0]])
+                    self.webClipboard.webClip_contents[self.get_curselection()[
+                        0]-1])
 
-                self.clip_contents[0] = self.clip_contents[self.get_curselection()[
-                    0]]
-                self.update_list_box(self.clip_contents)
+                self.webClipboard.locClip_content = read_local_clip()
+                contents = self.webClipboard.webClip_contents.copy()
+                contents.insert(0, self.webClipboard.locClip_content)
+                self.update_list_box(contents)
         else:
             sug = self.list_box.get(self.get_curselection()[0])
             print(sug)
@@ -109,8 +92,14 @@ class List_box():
 
     def left(self):
         '''
-        注意self.clip_contents中第一个是本地内容
+        注意self.get_curselection()[0] == 0 是本地内容
         '''
-        if self.get_curselection()[0] > 0:
-            self.webClipboard.delete_web_clip(
-                self.get_curselection()[0]-1, self.wenclip_call_delete)
+        if self.show_mode == ContentShowMode.clip:
+            if self.get_curselection() != () and self.get_curselection()[0] > 0:
+                self.webClipboard.delete_web_clip(
+                    self.get_curselection()[0]-1, self.webclip_call)
+
+        elif self.show_mode == ContentShowMode.history:
+            if self.get_curselection() != ():
+                self.history.pop(self.get_curselection()[0])
+                self.update_history()
