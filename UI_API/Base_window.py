@@ -1,6 +1,7 @@
 from tkinter import Tk
 import win32com.client
 from win32gui import FindWindow, SetForegroundWindow
+from Logger import logger
 shell = win32com.client.Dispatch("WScript.Shell")
 
 
@@ -21,7 +22,7 @@ class Base_window():
             shell.SendKeys('%')
             SetForegroundWindow(self.hwnd)
         except:
-            print("E:show_window  SetForegroundWindow")
+            logger.warning("Base_window show_window SetForegroundWindow")
 
     def hide_window(self):
         self.main_window.withdraw()

@@ -5,6 +5,7 @@ from Search_for_suggestions import Search_for_suggestions
 from WebClipboard import WebClipboard, read_local_clip, write_local_clip
 from History import History
 from MyEnum import ContentShowMode, WindowsShowMode
+from Logger import logger
 
 
 class List_box():
@@ -26,7 +27,7 @@ class List_box():
 
     def update_webclip(self):
         if self.state == WindowsShowMode.show:
-            print("update_webclip")
+            logger.info("update_webclip")
             self.show_mode = ContentShowMode.clip
             self.webClipboard.locClip_content = read_local_clip()
             self.webClipboard.read_web_clip(0, 0, self.webclip_call)
@@ -35,7 +36,6 @@ class List_box():
         '''
         请求webclip后的回调
         '''
-        print(json_all)
         if self.show_mode == ContentShowMode.clip:
             contents = self.webClipboard.webClip_contents.copy()
             contents.insert(0, self.webClipboard.locClip_content)
@@ -43,13 +43,12 @@ class List_box():
 
     def update_history(self):
         if self.state == WindowsShowMode.show:
-            print("update_history")
+            logger.info("update_history")
             self.show_mode = ContentShowMode.history
             self.update_list_box(self.history.get())
 
     def get_focues(self):
         if str(self.list_box.focus_get()) != ".!listbox" and self.get_size() != 0:
-            print("get_focues")
             self.list_box.focus_set()
             self.list_box.selection_set(0)
 
@@ -73,10 +72,12 @@ class List_box():
         if self.show_mode == ContentShowMode.clip:
             if self.get_curselection()[0] == 0:
                 # 上传
+                logger.info("上传剪切板")
                 self.webClipboard.write_web_clip(
                     self.webClipboard.locClip_content, self.webclip_call)
             else:
                 # 下载
+                logger.info("下载剪切板")
                 write_local_clip(
                     self.webClipboard.webClip_contents[self.get_curselection()[
                         0]-1])
@@ -87,7 +88,6 @@ class List_box():
                 self.update_list_box(contents)
         else:
             sug = self.list_box.get(self.get_curselection()[0])
-            print(sug)
             self.mediator.notify(self, {"type_sug": sug})
 
     def left(self):
@@ -95,6 +95,7 @@ class List_box():
         注意self.get_curselection()[0] == 0 是本地内容
         '''
         if self.show_mode == ContentShowMode.clip:
+            logger.info("删除剪切板")
             if self.get_curselection() != () and self.get_curselection()[0] > 0:
                 self.webClipboard.delete_web_clip(
                     self.get_curselection()[0]-1, self.webclip_call)

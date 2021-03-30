@@ -1,5 +1,6 @@
 from Search_engine import search_engine
 from MyEnum import WindowsShowMode
+from Logger import logger
 
 
 class State():
@@ -35,7 +36,7 @@ class State():
         pass
 
     def update_UI_state(self):
-        print("update_UI_state")
+        logger.info("update_UI_state")
         self.context.list_box.state = self.context.state.statement()
         self.context.side_label.state = self.context.state.statement()
         self.context.search_box.state = self.context.state.statement()
@@ -49,46 +50,45 @@ class State_show(State):
         return WindowsShowMode.show
 
     def win_q(self,):
-        print("关")
+        logger.info("hide")
         self.context.control.unhook_suppress()
         self.context.state = State_hide(self.context)
         self.update_UI_state()
         self.context.base_window.hide_window()
 
     def win_w(self,):
-        print("win_w")
+        logger.info("win_w")
         from WebClipboard import read_local_clip
         self.context.text_view.show_view()
         self.context.text_view.write_view(read_local_clip())
 
     def tab(self,):
-        print("tab")
+        logger.info("tab")
         search_engine.swap_search_engin()
         self.context.side_label.update_logo()
 
     def enter(self):
-        print('enter')
+        logger.info('enter')
         if self.context.list_box.focues():
-            print("list_box")
+            logger.info("focues list_box")
             self.context.list_box.enter()
         elif self.context.search_box.focues():
-            print("search_box")
+            logger.info("focues search_box")
             self.context.search_box.enter()
             if search_engine.search_engines[0].get("name") != "google翻译":
                 self.win_q()
 
     def up(self):
-        print("up")
+        logger.info("up")
         if (self.context.list_box.selection_includes(0)):
             self.context.search_box.get_focues()
 
     def down(self):
-        print("down")
-        print(self.context.list_box.get_size())
+        logger.info("down")
         self.context.list_box.get_focues()
 
     def left(self):
-        print("left")
+        logger.info("left")
         self.context.list_box.left()
 
 
@@ -98,7 +98,7 @@ class State_hide(State):
         return WindowsShowMode.hide
 
     def win_q(self,):
-        print("开")
+        logger.info("show")
         self.context.control.hook_suppress()
         self.context.state = State_show(self.context)
         self.update_UI_state()
@@ -108,7 +108,7 @@ class State_hide(State):
             self.context.list_box.update_webclip()
 
     def win_w(self,):
-        print("现在是hide状态,执行了win_w")
+        logger.info("win_w")
         self.context.control.hook_suppress()
         self.context.state = State_show(self.context)
         self.update_UI_state()

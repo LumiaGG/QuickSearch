@@ -4,6 +4,7 @@ from UI_API.Text_view import Text_view
 from time import sleep
 from WebClipboard import new_thread
 from MyEnum import NotifyEvent
+from Logger import logger
 
 
 class Mediator():
@@ -43,7 +44,7 @@ class Search_Mediator(Mediator):
         # 直接在此函数加载 suggestions
         self.text_view.hide_view()
         sleep(0.001)
-        print(self.search_box.entry.get())
+        logger.info(self.search_box.entry.get())
         if self.search_box.entry.get() == "":  # 检查内容有效性
             # 显示 webclip
             self.list_box.update_webclip()
